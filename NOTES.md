@@ -30,5 +30,40 @@
 
 ### 2.2 Low Level Nonsense and Network Theory
 
-- 
+- **Data Encapsulation** - a packet is born (data) -> it is wrapped in a header by the first protocol (say, *tftp*) -> the whole thing is encapsulated again by the next protocol (say, *UDP*) -> then the next (*IP*) -> then finally by the protocol on the hardware layer (*ethernet*)
+    - when another component receives the packet, it is stripped one by one - the hw strips the *ethernet* header -> the kernel strips the *IP* and *UDP* headers -> the *tftp* program strips the *tftp* headers and finally the data is obtained.
+- **Layered Network Model** (ISO / OSI) - some advantages over other models ([ref](https://utsa.pressbooks.pub/networking/chapter/overview-of-network-models/)). socket programs can be written in the same way without caring about how the data will be transmitted physically, cause the lower level programs will take care of that.
+- following are the layers of a full-blown network model:
+    - Application
+    - Presentation
+    - Session
+    - Transport
+    - Network
+    - Data Link
+    - Physical
+- The Physical Layer is the hardware (serial, Ethernet, etc.). The Application Layer is the place where users interact with the network.
+- A layered model more consistent with Unix might be:
+    - Application Layer (telnet, ftp, etc.)
+    - Host-to-Host Transport Layer (TCP, UDP)
+    - Internet Layer (IP and routing)
+    - Network Access Layer (Ethernet, wi-fi, or whatever)
+- further study on routing and the *IP* layer - [RFC 791](https://datatracker.ietf.org/doc/html/rfc791)
 
+## 3.0 IP Addresses, structs & Data Munging
+
+### 3.1 IPv6 and IPv6
+
+- old network routing system called The Internet Protocol Version 4, also called IPv4. It had addresses made up of four bytes (A.K.A. four “octets”), and was commonly written in “dots and numbers” form, like so: `192.0.2.111`
+- as devices grew, people were afraid that we'll run out of IPv4 addresses. in the beginning, when there were only a few computers and everyone thought a billion was an impossibly large number, some big organizations were generously allocated millions of IP addresses for their own use. (Such as Xerox, MIT, Ford, HP, IBM, GE, AT&T, and some little company called Apple, to name a few.)
+- so IPv6 was born, much to the pleasure of Vint Cerf.
+- IPv6 has 128 bits; that about  340 trillion trillion trillion addresses. Overcompensation imho.
+- IPv6 is represented as hex, with every 2 byte chunk separated by a colon - `2001:0db8:c9d2:aee5:73e3:934a:a5ae:9551`
+- IP address with lots of zeros in it can be compressed them. you can leave off leading zeros for each byte pair. For instance, each of these pairs of addresses are equivalent:
+    - `2001:0db8:c9d2:0012:0000:0000:0000:0051` == `2001:db8:c9d2:12::51`
+    - `2001:0db8:ab00:0000:0000:0000:0000:0000` == `2001:db8:ab00::`
+    - `0000:0000:0000:0000:0000:0000:0000:0001` == `::1`
+- `::1` is the loopback address. It means "current machine". In IPv4, the loopback address is `127.0.0.1`
+-  IPv4-compatibility mode for IPv6 addresses: `192.0.2.33` == `::ffff:192.0.2.33`
+-  Creators of IPv6 have quite cavalierly lopped off trillions and trillions of addresses for reserved use.
+
+#### 3.1.1 subnets
